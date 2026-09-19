@@ -1,0 +1,8 @@
+{
+    "mcpServers": {
+        "laravel-boost": {
+            "command": "wsl.exe",
+            "args": ["/usr/bin/php8.3", "/home/fedrian/Laracast/symposium/artisan", "boost:mcp"]
+        }
+    }
+}
