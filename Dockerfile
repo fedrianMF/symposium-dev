@@ -35,10 +35,11 @@ COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-RUN mkdir -p /var/www/html/storage /var/www/html/bootstrap/cache \
-    && chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+RUN mkdir -p /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database/data \
+    && chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database/data
 
-VOLUME ["/var/www/html/database"]
+# Solo la carpeta de la base es persistente; así las migraciones siempre vienen de la imagen
+VOLUME ["/var/www/html/database/data"]
 
 EXPOSE 80
 
