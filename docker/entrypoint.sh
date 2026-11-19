@@ -7,9 +7,8 @@ if [ ! -f /var/www/html/database/database.sqlite ]; then
 fi
 chown -R www-data:www-data /var/www/html/database
 
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
-php artisan migrate --force
+# Ejecuta artisan como www-data para que logs y cachés no queden como root
+su-exec www-data php artisan optimize
+su-exec www-data php artisan migrate --force
 
 exec supervisord -c /etc/supervisor/conf.d/supervisord.conf

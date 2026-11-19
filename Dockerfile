@@ -1,5 +1,5 @@
 # ---- Etapa 1: build de assets (Vite/Node) ----
-FROM node:20-alpine AS node_builder
+FROM node:24-alpine AS node_builder
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
@@ -10,18 +10,20 @@ RUN npm run build
 FROM composer:2 AS composer_builder
 WORKDIR /app
 COPY composer.json composer.lock ./
-RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist
+RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist --no-interaction
 COPY . .
 RUN composer dump-autoload --optimize --no-dev
 
 # ---- Etapa 3: imagen final ----
-FROM php:8.3-fpm-alpine
+FROM php:8.4-fpm-alpine
 
 RUN apk add --no-cache \
-    nginx supervisor sqlite sqlite-dev \
-    libpng-dev libjpeg-turbo-dev freetype-dev libzip-dev oniguruma-dev \
+    nginx supervisor su-exec sqlite sqlite-dev \
+    libpng-dev libjpeg-turbo-dev freetype-dev libzip-dev oniguruma-dev icu-dev postgresql-dev \
     && docker-php-ext-configure gd --with-jpeg --with-freetype \
-    && docker-php-ext-install pdo pdo_sqlite mbstring zip gd bcmath
+    && docker-php-ext-install pdo pdo_sqlite pdo_mysql pdo_pgsql mbstring zip gd bcmath intl opcache pcntl
+
+COPY docker/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
 
 WORKDIR /var/www/html
 
